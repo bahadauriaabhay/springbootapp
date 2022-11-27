@@ -1,0 +1,1 @@
+java -jar -Dspring.profiles.active=mysql -Dspring.datasource.username="${DB_USER}" -Dspring.datasource.password="${DB_PASS}" -Dspring.datasource.url="jdbc:mysql://${DB_ENDPOINT}/${DB_NAME}?autoReconnect=true&useSSL=false" target/spring-boot-rest-example-0.5.0.war

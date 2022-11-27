@@ -59,9 +59,10 @@ spring:
   profiles: mysql
 
   datasource:
-    url: jdbc:mysql://database1.cthukqfhrn6t.us-east-1.rds.amazonaws.com/db?autoReconnect=true&useSSL=false
-    username: database1
-    password: database1
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost/db?autoReconnect=true&useSSL=false
+    username: root
+    password: mysql
 
   jpa:
     hibernate:
