@@ -1,3 +1,98 @@
+## Terraform ecs Modules 
+
+#### usage for ecs modules
+
+```hcl
+  source         = "./modules/ecs"
+  name           = "demo1"
+  vpc_id         = module.network.vpcid
+
+  on_demand_percentage = 0
+  asg_min              = 1
+  asg_max              = 3
+  desired_capacity     = 1
+
+  container_cpu    = 100
+  container_memory = 512
+  containerPort    = 80
+  hostPort         = 80
+  #load balancer 
+  path = "/" #target_group_health_check_path
+  port = 80
+```
+
+#### additional variable you can use
+
+```hcl
+imageURI         = []
+```
+## Terraform ASG Modules
+
+#### usage for ASG modules
+```hcl
+module "asg" {
+  source            = "./modules/asg"
+  name              = "demo1"
+  asg_max           = 1
+  asg_min           = 1
+  health_check_type = "ELB"
+  desired_capacity  = 1
+  force_delete      = "true"
+  instance_types    = "t2.micro"
+  asg_sg            = [module.sgASG.sgid]
+  vpc_zone_id       = [module.network.private_subnet_ids1, module.network.private_subnet_ids2]
+
+}
+```
+
+## Terraform RDS Modules
+#### usage for RDS modules
+```hcl
+module "rds" {
+  source            = "./modules/rds"
+  allocated_storage = 10
+  db_name           = "database23"
+  engine            = "mysql"
+  engine_version    = "5.7"
+  instance_class    = "db.t3.micro"
+  username          = "database23"
+
+  parameter_group_name   = "default.mysql5.7"
+  skip_final_snapshot    = true
+  db_subnet_group_name   = module.network.aws_db_subnet_group-default
+  vpc_security_group_ids = [module.sgRDS.sgid]
+}
+```
+
+
+#### terraform command
+
+##### to initialize module dependencies
+
+``` terraform init ```
+
+##### it will show details what terraform creating       
+
+``` terraform plan ```    
+
+##### to create planned resource 
+
+``` terraform apply ```
+
+
+terraform apply & plan instructions
+when you use terraform apply & terraform plan command it will ask value for imageURI you have to enter you image uri.
+you can use following command passing variable 
+
+```terraform plan -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/images:latest --auto-approve```
+
+```terraform apply -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/images:latest --auto-approve```
+
+
+
+
+
+
 # Spring Boot "Microservice" Example Project
 
 This is a sample Java / Maven / Spring Boot (version 1.5.6) application that can be used as a starter for creating a microservice complete with built-in health check, metrics and much more. I hope it helps you.
