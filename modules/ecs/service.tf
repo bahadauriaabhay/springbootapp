@@ -30,7 +30,7 @@ resource "aws_ecs_service" "ecs-service" {
   	cluster              = var.name
   	task_definition      = aws_ecs_task_definition.task.arn
   	desired_count        = var.desired_count
-    force_new_deployment = true
+    force_new_deployment = "true"
 
   	load_balancer {
     	target_group_arn   = aws_lb_target_group.test.arn
