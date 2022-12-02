@@ -1,16 +1,13 @@
 ## Terraform ecs Modules 
 
-#### usage for ecs modules
+#### usage for ecs modules   -- update container_cpu , container_memory , containerPort ,hostPort according to your application requirement in ecs module
 
 ```hcl
   source         = "./modules/ecs"
   name           = "demo1"
   vpc_id         = module.network.vpcid
 
-  on_demand_percentage = 0
-  asg_min              = 1
-  asg_max              = 3
-  desired_capacity     = 1
+
 
   container_cpu    = 100
   container_memory = 512
@@ -26,9 +23,9 @@
 ```hcl
 imageURI         = []
 ```
-## Terraform ASG Modules
+## Terraform asg Modules
 
-#### usage for ASG modules
+#### usage for asg modules  -- update auto scaling group module accoring to your requirement you can update asg_max , asg_min , desired_capacity (for your instances) , update instance_types accoring to your requirement 
 ```hcl
 module "asg" {
   source            = "./modules/asg"
@@ -39,14 +36,14 @@ module "asg" {
   desired_capacity  = 1
   force_delete      = "true"
   instance_types    = "t2.micro"
-  asg_sg            = [module.sgASG.sgid]
-  vpc_zone_id       = [module.network.private_subnet_ids1, module.network.private_subnet_ids2]
+
 
 }
 ```
+#### usage for  modules
 
-## Terraform RDS Modules
-#### usage for RDS modules
+## Terraform rds Modules
+#### usage for rds modules
 ```hcl
 module "rds" {
   source            = "./modules/rds"

@@ -12,8 +12,8 @@ module "ecs" {
   port = 8090
 
   imageURI         = var.imageURI
-  container_cpu    = 100
-  container_memory = 512
+  container_cpu    = 800
+  container_memory = 1024
   containerPort    = 8090
   hostPort         = 8090
   ssm_variables    = { "DB_ENDPOINT" : module.rds.ssm_parameter_rds_endpoint, "DB_NAME" : module.rds.ssm_parameter_rds_dbname, "DB_USER" : module.rds.ssm_parameter_rds_user, "DB_PASS" : module.rds.ssm_parameter_rds_password }
@@ -58,7 +58,7 @@ module "asg" {
   health_check_type = "ELB"
   desired_capacity  = 1
   force_delete      = "true"
-  instance_types    = "t2.micro"
+  instance_types    = "t3.medium"
   asg_sg            = [module.sgASG.sgid]
   vpc_zone_id       = [module.network.private_subnet_ids1, module.network.private_subnet_ids2]
 
