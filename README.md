@@ -9,13 +9,13 @@
 
 
 
-  container_cpu    = 100
-  container_memory = 512
-  containerPort    = 80
-  hostPort         = 80
+  container_cpu    =                #default=100
+  container_memory =                #default=512
+  containerPort    =                #default=80
+  hostPort         =                #default=80
   #load balancer 
-  path = "/" #target_group_health_check_path
-  port = 80
+  path =                            #default="/" #target_group_health_check_path
+  port =                            #default=80  #listner port
 ```
 
 #### additional variable you can use
@@ -30,12 +30,12 @@ imageURI         = []
 module "asg" {
   source            = "./modules/asg"
   name              = "demo1"
-  asg_max           = 1
-  asg_min           = 1
-  health_check_type = "ELB"
-  desired_capacity  = 1
-  force_delete      = "true"
-  instance_types    = "t2.micro"
+  asg_max           =               #default=1
+  asg_min           =               #default=1
+  health_check_type =               #default="ELB"
+  desired_capacity  =               #default=1
+  force_delete      =               #default="true"
+  instance_types    =               #default="t2.micro"
 
 
 }
@@ -43,21 +43,21 @@ module "asg" {
 #### usage for  modules
 
 ## Terraform rds Modules
-#### usage for rds modules
+#### usage for rds modules  -- in rds module you can define engine and engine_version (like if you want mysql version 5.7 ) , in allocated_storage you can define storage capacity , in instance_class define database instance class , in db_name define your database name , in username define database user  for data base password i use random_string password generator it will store password in ssm parameter store. i am using aws ssm parameter to store database name , username , password , endpoint. 
 ```hcl
 module "rds" {
   source            = "./modules/rds"
-  allocated_storage = 10
-  db_name           = "database23"
-  engine            = "mysql"
-  engine_version    = "5.7"
-  instance_class    = "db.t3.micro"
-  username          = "database23"
+  allocated_storage =               #default=10
+  db_name           =               #default="database23"
+  engine            =               #default="mysql"
+  engine_version    =               #default="5.7"
+  instance_class    =               #default="db.t3.micro"
+  username          =               #default="database23"
 
-  parameter_group_name   = "default.mysql5.7"
-  skip_final_snapshot    = true
-  db_subnet_group_name   = module.network.aws_db_subnet_group-default
-  vpc_security_group_ids = [module.sgRDS.sgid]
+  parameter_group_name   =          #default="default.mysql5.7"
+  skip_final_snapshot    =          #default=true
+  
+
 }
 ```
 
@@ -77,9 +77,10 @@ module "rds" {
 ``` terraform apply ```
 
 
-terraform apply & plan instructions
+```terraform apply & plan instructions
 when you use terraform apply & terraform plan command it will ask value for imageURI you have to enter you image uri.
-you can use following command passing variable 
+you can use following command passing variable
+``` 
 
 ```terraform plan -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/images:latest --auto-approve```
 
@@ -88,6 +89,13 @@ you can use following command passing variable
 
 
 
+
+
+
+
+
+
+# The following instructions are for sprin-boot-app
 
 
 # Spring Boot "Microservice" Example Project

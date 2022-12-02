@@ -9,13 +9,13 @@ module "ecs" {
   public_sg  = [module.sgALB.sgid]    #ALBsecuritygroup&public_subnet
   public_sub = [module.network.public_subnet_ids1, module.network.public_subnet_ids2]
   path = "/swagger-ui.html" #target_group_health_check_path
-  port = 8090
+#  port = 8090
 
   imageURI         = var.imageURI
   container_cpu    = 800
   container_memory = 1024
   containerPort    = 8090
-  hostPort         = 8090
+  hostPort         = 0
   ssm_variables    = { "DB_ENDPOINT" : module.rds.ssm_parameter_rds_endpoint, "DB_NAME" : module.rds.ssm_parameter_rds_dbname, "DB_USER" : module.rds.ssm_parameter_rds_user, "DB_PASS" : module.rds.ssm_parameter_rds_password }
  
 }
@@ -25,8 +25,8 @@ module "sgASG" {
   name      = "ecs"
   sg_cidr   = [module.network.cidr_block]
   sg_vpc_id = module.network.vpcid
-  from_port = 8090
-  to_port   = 8091
+  from_port = 49153  #8090for dynamic port 
+  to_port   = 65535  #8091
 
 
 }

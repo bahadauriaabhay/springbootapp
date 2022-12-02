@@ -160,9 +160,9 @@ variable "ssm_variables" {
 variable "path" {
   default = "/"
 }
-variable "port" {
-  default = 80
-}
+#variable "port" {
+#  default = 80
+#}
 variable "healthy_threshold" {
   default = 6
 }

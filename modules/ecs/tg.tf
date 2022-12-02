@@ -15,7 +15,7 @@ resource "aws_lb_target_group" "test" {
   vpc_id   = var.vpc_id
   health_check {
     path                = var.path
-    port                = var.port
+#    port                = var.port  dynamic port
     healthy_threshold   = var.healthy_threshold
     unhealthy_threshold = var.unhealthy_threshold
     timeout             = var.timeout
