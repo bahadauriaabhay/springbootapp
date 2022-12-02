@@ -15,7 +15,7 @@
   hostPort         =                #default=80
   #load balancer 
   path =                            #default="/" #target_group_health_check_path
-  port =                            #default=80  #listner port
+  #port =                            #default=80  #dynamic port mapping
 ```
 
 #### additional variable you can use
