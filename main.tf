@@ -5,23 +5,19 @@ module "ecs" {
   source     = "./modules/ecs"
   asg_arn    = module.asg.asg_arn
   name       = "demo1"
-  vpc_id     = module.network.vpcid
-  public_sg  = [module.sgALB.sgid]
+  vpc_id     = module.network.vpcid   #target_group_vpcid
+  public_sg  = [module.sgALB.sgid]    #ALBsecuritygroup&public_subnet
   public_sub = [module.network.public_subnet_ids1, module.network.public_subnet_ids2]
-  #  on_demand_percentage = 0
-  #  asg_min              = 1
-  #  asg_max              = 3
-  #  desired_capacity     = 1
-  #  asg_target_capacity  = 80
+  path = "/swagger-ui.html" #target_group_health_check_path
+  port = 8090
+
   imageURI         = var.imageURI
   container_cpu    = 100
   container_memory = 512
   containerPort    = 8090
   hostPort         = 8090
   ssm_variables    = { "DB_ENDPOINT" : module.rds.ssm_parameter_rds_endpoint, "DB_NAME" : module.rds.ssm_parameter_rds_dbname, "DB_USER" : module.rds.ssm_parameter_rds_user, "DB_PASS" : module.rds.ssm_parameter_rds_password }
-
-  path = "/swagger-ui.html" #health_check_path
-  port = 8090
+ 
 }
 
 module "sgASG" {
@@ -48,7 +44,7 @@ module "sgALB" {
 module "sgRDS" {
   source    = "./modules/sg"
   name      = "ecs3"
-  sg_cidr   = ["0.0.0.0/0"]
+  sg_cidr   = [module.network.cidr_block]
   sg_vpc_id = module.network.vpcid
   from_port = 3306
   to_port   = 3306
