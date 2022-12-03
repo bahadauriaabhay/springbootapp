@@ -200,7 +200,7 @@ variable "autoscaling_min" {
 }
 
 variable "autoscaling_target_cpu" {
-  default     = 80
+  default     = 50
   description = "Target average CPU percentage to track for autoscaling"
 }
 

@@ -1,5 +1,5 @@
 FROM ubuntu
-MAINTAINER "abhay19"
+MAINTAINER "abhay20"
 RUN apt-get update
 RUN apt-get install -y openjdk-8-jdk
 RUN apt-get install -y maven
