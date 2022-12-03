@@ -3,6 +3,7 @@ variable  "allocated_storage" {
 }
 variable  "db_name" {
     type = string
+    default = "database23"
 }
 variable  "engine" {
     default = "mysql"
@@ -15,6 +16,10 @@ variable  "instance_class" {
 }
 variable  "username" {
     type = string
+    default = "database23"
+}
+variable  "rdsdbpass" {
+    default = "random_string.rds_db_password.result"
 }
 
 variable  "parameter_group_name" {

@@ -178,7 +178,7 @@ variable "interval" {
 variable "matcher" {
   default = 200
 }
-
+#service-app-autoscaling-group
 variable "autoscaling_cpu" {
   default     = false
   description = "Enables autoscaling based on average CPU tracking"
@@ -200,7 +200,7 @@ variable "autoscaling_min" {
 }
 
 variable "autoscaling_target_cpu" {
-  default     = 50
+  default     = 80
   description = "Target average CPU percentage to track for autoscaling"
 }
 

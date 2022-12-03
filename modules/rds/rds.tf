@@ -10,7 +10,7 @@ resource "aws_db_instance" "this" {
   engine_version         = var.engine_version
   instance_class         = var.instance_class
   username               = var.username
-  password               = random_string.rds_db_password.result
+  password               = var.rdsdbpass
   parameter_group_name   = var.parameter_group_name
   skip_final_snapshot    = var.skip_final_snapshot
   vpc_security_group_ids = var.vpc_security_group_ids     
