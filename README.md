@@ -1,10 +1,10 @@
 ## Docker commands to build , tag and push docker image to ECR registry
 ``` 
-docker build -t 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> Dockerfile .
+docker build -t 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> -f Dockerfile .
 docker push 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag>
 ```
 
-## s3 backend -- i am using s3 bucket as backend to save .tfstate file. you have to configure your s3 bucket in terraform's providers.tf file or you can use local to save your .tfstate file 
+## s3 backend -- i am using s3 bucket as backend to save .tfstate file. you have to configure your s3 bucket in terraform's providers.tf file or you can remove s3 backend resourse to save your .tfstate file in local
 
 
 ## This terraform module builds an Elastic Container Service(ECS) Cluster in AWS.
