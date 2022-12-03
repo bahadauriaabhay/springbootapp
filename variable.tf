@@ -1,3 +1,6 @@
+variable "name" {
+    default = "demo1"
+}
 ##ASG_variable
 #variable "asg_min" {
 #    default = "1"

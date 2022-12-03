@@ -4,7 +4,7 @@ module "network" {
 module "ecs" {
   source     = "./modules/ecs"
   asg_arn    = module.asg.asg_arn
-  name       = "demo1"
+  name       = var.name
   vpc_id     = module.network.vpcid   #target_group_vpcid
   public_sg  = [module.sgALB.sgid]    #ALBsecuritygroup&public_subnet
   public_sub = [module.network.public_subnet_ids1, module.network.public_subnet_ids2]
@@ -52,13 +52,13 @@ module "sgRDS" {
 
 module "asg" {
   source            = "./modules/asg"
-  name              = "demo1"
+  name              = var.name
   asg_max           = 1
   asg_min           = 1
   health_check_type = "ELB"
   desired_capacity  = 1
   force_delete      = "true"
-  instance_types    = "t3.medium"
+  instance_types    = "t3.small"
   asg_sg            = [module.sgASG.sgid]
   vpc_zone_id       = [module.network.private_subnet_ids1, module.network.private_subnet_ids2]
 

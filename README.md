@@ -1,3 +1,12 @@
+## This terraform module builds an Elastic Container Service(ECS) Cluster in AWS.
+## The following resources will be created:
+```hcl
+-- VPC , NAT Gateway , Security Group for Auto scaling group , RDS , ALB
+-- RDS , SSM Parameter 
+-- Application Load Balancer , Target Group
+-- ECS , Task Defination , Service 
+```
+
 ## Terraform ecs Modules 
 
 #### usage for ecs modules   -- update container_cpu , container_memory , containerPort ,hostPort according to your application requirement in ecs module
@@ -26,6 +35,7 @@ imageURI         = []
 ## Terraform asg Modules
 
 #### usage for asg modules  -- update auto scaling group module accoring to your requirement you can update asg_max , asg_min , desired_capacity (for your instances) , update instance_types accoring to your requirement 
+#### suggetion -- use instance type "t3.small/2vCPU 2Gib memory" if you are deploying spring-boot-app else your task in ecs sservice will not get updated
 ```hcl
 module "asg" {
   source            = "./modules/asg"
@@ -40,7 +50,7 @@ module "asg" {
 
 }
 ```
-#### usage for  modules
+
 
 ## Terraform rds Modules
 #### usage for rds modules  -- in rds module you can define engine and engine_version (like if you want mysql version 5.7 ) , in allocated_storage you can define storage capacity , in instance_class define database instance class , in db_name define your database name , in username define database user  for data base password i use random_string password generator it will store password in ssm parameter store. i am using aws ssm parameter to store database name , username , password , endpoint. 
@@ -58,6 +68,18 @@ module "rds" {
   skip_final_snapshot    =          #default=true
   
 
+}
+```
+## Terraform security group Modules
+
+#### usage for sg modules  -- using three security group for RDS , Auto Scaling Group , ALB you can control access with port and CIDR range or from ip
+```hcl
+module "sgRDS" {
+  source    = "./modules/sg"
+  name      = "ecs3"
+  sg_cidr   = [module.network.cidr_block]
+  from_port = 3306
+  to_port   = 3306
 }
 ```
 
