@@ -190,7 +190,7 @@ variable "autoscaling_memory" {
 }
 
 variable "autoscaling_max" {
-  default     = 4
+  default     = 3
   description = "Max number of containers to scale with autoscaling"
 }
 

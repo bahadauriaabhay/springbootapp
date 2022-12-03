@@ -126,7 +126,7 @@ you can use following command passing variable
 
 
 
-# The following instructions are for sprin-boot-app
+# The following instructions are for sprin-boot-app  (provided with application)
 
 
 # Spring Boot "Microservice" Example Project
