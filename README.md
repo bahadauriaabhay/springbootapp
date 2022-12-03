@@ -1,3 +1,12 @@
+## Docker commands to build , tag and push docker image to ECR registry
+``` 
+docker build -t 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> Dockerfile .
+docker push 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag>
+```
+
+## s3 backend -- i am using s3 bucket as backend to save .tfstate file. you have to configure your s3 bucket in terraform's providers.tf file or you can use local to save your .tfstate file 
+
+
 ## This terraform module builds an Elastic Container Service(ECS) Cluster in AWS.
 ## The following resources will be created:
 ```hcl
@@ -104,15 +113,15 @@ when you use terraform apply & terraform plan command it will ask value for imag
 you can use following command passing variable
 ``` 
 
-```terraform plan -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/images:latest --auto-approve```
+```terraform plan -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> --auto-approve```
 
-```terraform apply -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/images:latest --auto-approve```
-
-
+```terraform apply -var imageURI=8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> --auto-approve```
 
 
 
+## s3 backend -- i am using s3 bucket as backend to save .tfstate file. you have to configure your s3 bucket or you can use local to save your .tfstate file
 
+## used policy -- AmazonEC2ContainerServiceforEC2Role , AmazonEC2RoleforSSM , AmazonECSTaskExecutionRolePolicy 
 
 
 

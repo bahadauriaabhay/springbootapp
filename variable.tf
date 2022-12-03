@@ -1,6 +1,10 @@
 variable "name" {
     default = "demo1"
 }
+
+variable "imageURI" {
+    
+}
 ##ASG_variable
 #variable "asg_min" {
 #    default = "1"
@@ -71,6 +75,3 @@ variable "name" {
 #    default = "true"
 #}
 
-variable "imageURI" {
-    
-}
