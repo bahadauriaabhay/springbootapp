@@ -12,8 +12,8 @@ module "ecs" {
 #  port = 8090
 
   imageURI         = var.imageURI
-  container_cpu    = 800
-  container_memory = 1024
+  container_cpu    = 512
+  container_memory = 736
   containerPort    = 8090
   hostPort         = 0
   ssm_variables    = { "DB_ENDPOINT" : module.rds.ssm_parameter_rds_endpoint, "DB_NAME" : module.rds.ssm_parameter_rds_dbname, "DB_USER" : module.rds.ssm_parameter_rds_user, "DB_PASS" : module.rds.ssm_parameter_rds_password }
