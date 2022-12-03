@@ -178,3 +178,43 @@ variable "interval" {
 variable "matcher" {
   default = 200
 }
+
+variable "autoscaling_cpu" {
+  default     = false
+  description = "Enables autoscaling based on average CPU tracking"
+}
+
+variable "autoscaling_memory" {
+  default     = false
+  description = "Enables autoscaling based on average Memory tracking"
+}
+
+variable "autoscaling_max" {
+  default     = 4
+  description = "Max number of containers to scale with autoscaling"
+}
+
+variable "autoscaling_min" {
+  default     = 1
+  description = "Min number of containers to scale with autoscaling"
+}
+
+variable "autoscaling_target_cpu" {
+  default     = 50
+  description = "Target average CPU percentage to track for autoscaling"
+}
+
+variable "autoscaling_target_memory" {
+  default     = 90
+  description = "Target average Memory percentage to track for autoscaling"
+}
+
+variable "autoscaling_scale_in_cooldown" {
+  default     = 300
+  description = "Cooldown in seconds to wait between scale in events"
+}
+
+variable "autoscaling_scale_out_cooldown" {
+  default     = 300
+  description = "Cooldown in seconds to wait between scale out events"
+}

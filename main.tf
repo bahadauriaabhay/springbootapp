@@ -17,7 +17,8 @@ module "ecs" {
   containerPort    = 8090
   hostPort         = 0
   ssm_variables    = { "DB_ENDPOINT" : module.rds.ssm_parameter_rds_endpoint, "DB_NAME" : module.rds.ssm_parameter_rds_dbname, "DB_USER" : module.rds.ssm_parameter_rds_user, "DB_PASS" : module.rds.ssm_parameter_rds_password }
- 
+  autoscaling_cpu  = true
+  autoscaling_target_cpu = 70
 }
 
 module "sgASG" {
@@ -27,8 +28,6 @@ module "sgASG" {
   sg_vpc_id = module.network.vpcid
   from_port = 49153  #8090for dynamic port 
   to_port   = 65535  #8091
-
-
 }
 
 module "sgALB" {
