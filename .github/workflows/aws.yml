@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: us-east-1                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: 331851393000.dkr.ecr.us-east-1.amazonaws.com/spring-be           # set this to your Amazon ECR repository name
+  ECR_REGISTRY: 331851393000.dkr.ecr.us-east-1.amazonaws.com/spring-be           # set this to your Amazon ECR repository name
   ECS_SERVICE: springboot-qa                # set this to your Amazon ECS service name
   ECS_CLUSTER: ecs-infra-qa                  # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: springboot-qa           # set this to the path to your Amazon ECS task definition
@@ -74,9 +74,9 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+        docker push $ECR_REGISTRY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
