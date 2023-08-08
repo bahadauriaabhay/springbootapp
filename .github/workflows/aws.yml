@@ -79,6 +79,16 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Update ECS service
+    - name: Update ECS Task Definition
       run: |
-        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+          # Fetch the existing task definition JSON using AWS CLI
+          task_def_json=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION)
+
+          # Modify the task definition JSON with the new image version
+          # You'll need to use jq or other tools to parse and update the JSON
+
+          # Update the task definition using the modified JSON
+          updated_task_def_arn=$(aws ecs register-task-definition --cli-input-json "$task_def_json")
+
+          # Update the ECS service to use the updated task definition
+          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $SERVICE_NAME --task-definition $updated_task_def_arn
