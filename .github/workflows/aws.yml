@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: us-east-1                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: 331851393000.dkr.ecr.us-east-1.amazonaws.com/spring-be           # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: spring-be           # set this to your Amazon ECR repository name
   ECS_SERVICE: springboot-qa                # set this to your Amazon ECS service name
   ECS_CLUSTER: ecs-infra-qa                  # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: springboot-qa           # set this to the path to your Amazon ECS task definition
@@ -59,6 +59,8 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
+    - name: s3 list
+      run: aws s3 ls
 
     - name: Login to Amazon ECR
       id: login-ecr
