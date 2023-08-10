@@ -79,16 +79,28 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Update ECS Task Definition
+    - name: Get current task definition
+      id: get-task
       run: |
-          # Fetch the existing task definition JSON using AWS CLI
-          task_def_json=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION)
+        # Use AWS CLI to get the current task definition JSON
+        task_definition=$(aws ecs describe-services --cluster $ECS_CLUSTER --service $ECS_SERVICE --query 'services[0].taskDefinition' --output json)
+        echo "::set-output name=task_definition::$task_definition"
 
-          # Modify the task definition JSON with the new image version
-          # You'll need to use jq or other tools to parse and update the JSON
+    - name: Update image in task definition
+      id: update-image
+      run: |
+        # Use jq to update the image in the task definition JSON
+        updated_task_definition=$(echo ${{ steps.get-task.outputs.task_definition }} | jq '.containerDefinitions[0].image = "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"')
+        echo "::set-output name=updated_task_definition::$updated_task_definition"
 
-          # Update the task definition using the modified JSON
-          updated_task_def_arn=$(aws ecs register-task-definition --cli-input-json "$task_def_json")
+    - name: Register updated task definition
+      id: register-task
+      run: |
+        # Register the updated task definition
+        task_arn=$(aws ecs register-task-definition --cli-input-json '${{ steps.update-image.outputs.updated_task_definition }}' --query 'taskDefinition.taskDefinitionArn' --output json)
+        echo "::set-output name=task_arn::$task_arn"
 
-          # Update the ECS service to use the updated task definition
-          aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $SERVICE_NAME --task-definition $updated_task_def_arn
+    - name: Update service with new task definition
+      run: |
+        # Update ECS service with the new task definition
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ steps.register-task.outputs.task_arn }}
