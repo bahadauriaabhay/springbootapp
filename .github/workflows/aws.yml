@@ -80,27 +80,35 @@ jobs:
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Get current task definition
-      id: get-task
+      id: get_task
       run: |
         # Use AWS CLI to get the current task definition JSON
-        task_definition=$(aws ecs describe-services --cluster $ECS_CLUSTER --service $ECS_SERVICE --query 'services[0].taskDefinition' --output json)
-        echo "::set-output name=task_definition::$task_definition"
+        # and save it as an output for later use.
+        echo ::set-output name=taskdef::$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --query 'services[0].taskDefinition' --output text)
 
-    - name: Update image in task definition
-      id: update-image
+    - name: Update task definition image
+      id: update_image
       run: |
-        # Use jq to update the image in the task definition JSON
-        updated_task_definition=$(echo ${{ steps.get-task.outputs.task_definition }} | jq '.containerDefinitions.image = "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"')
-        echo "::set-output name=updated_task_definition::$updated_task_definition"
+        # Get the existing task definition JSON
+        TASK_DEF="$((echo ${{ steps.get_task.outputs.taskdef }}) | tr -d '[:space:]')"
+          
+        # Update the image tag in the task definition JSON
+        NEW_IMAGE=$IMAGE_TAG
+        NEW_TASK_DEF=$(echo $TASK_DEF | jq --arg newimage $NEW_IMAGE '.containerDefinitions[0].image=$newimage')
 
-    - name: Register updated task definition
-      id: register-task
+        echo $NEW_TASK_DEF > updated_taskdef.json
+        cat updated_taskdef.json
+          
+    - name: Register new task definition
+      id: register_task
       run: |
         # Register the updated task definition
-        task_arn=$(aws ecs register-task-definition --cli-input-json '${{ steps.update-image.outputs.updated_task_definition }}' --query 'taskDefinition.taskDefinitionArn' --output json)
-        echo "::set-output name=task_arn::$task_arn"
+        NEW_TASK_DEF_FILE=updated_taskdef.json
+        REGISTERED_ARN=$(aws ecs register-task-definition --cli-input-json file://$NEW_TASK_DEF_FILE --query 'taskDefinition.taskDefinitionArn' --output text)
+        echo ::set-output name=task_arn::$REGISTERED_ARN
 
-    - name: Update service with new task definition
+    - name: Update ECS service
       run: |
-        # Update ECS service with the new task definition
-        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ steps.register-task.outputs.task_arn }}
+        # Update the ECS service with the new task definition
+        NEW_TASK_DEF_ARN=${{ steps.register_task.outputs.task_arn }}
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $NEW_TASK_DEF_ARN
