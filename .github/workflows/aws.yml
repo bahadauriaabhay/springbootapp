@@ -90,7 +90,7 @@ jobs:
       id: update-image
       run: |
         # Use jq to update the image in the task definition JSON
-        updated_task_definition=$(echo ${{ steps.get-task.outputs.task_definition }} | jq '.containerDefinitions[0].image = "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"')
+        updated_task_definition=$(echo ${{ steps.get-task.outputs.task_definition }} | jq '.containerDefinitions.image = "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"')
         echo "::set-output name=updated_task_definition::$updated_task_definition"
 
     - name: Register updated task definition
