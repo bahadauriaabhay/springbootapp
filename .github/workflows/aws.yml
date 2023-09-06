@@ -80,28 +80,15 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Get current task definition
-      id: get-task
+    - name: Deploy to ECS with new image tag
       run: |
-        # Use AWS CLI to get the current task definition JSON
-        task_definition=$(aws ecs describe-services --cluster $ECS_CLUSTER --service $ECS_SERVICE --query 'services[0].taskDefinition' --output json)
-        echo "::set-output name=task_definition::$task_definition"
+       # Get the build number from GitHub Actions
+       BUILD_NUMBER=${{ github.run_number }}
 
-    - name: Update image in task definition
-      id: update-image
-      run: |
-        # Use jq to update the image in the task definition JSON
-        updated_task_definition=$(echo ${{ steps.get-task.outputs.task_definition }} | jq '.containerDefinitions.image = "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"')
-        echo "::set-output name=updated_task_definition::$updated_task_definition"
-
-    - name: Register updated task definition
-      id: register-task
-      run: |
-        # Register the updated task definition
-        task_arn=$(aws ecs register-task-definition --cli-input-json '${{ steps.update-image.outputs.updated_task_definition }}' --query 'taskDefinition.taskDefinitionArn' --output json)
-        echo "::set-output name=task_arn::$task_arn"
-
-    - name: Update service with new task definition
-      run: |
-        # Update ECS service with the new task definition
-        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ steps.register-task.outputs.task_arn }}
+       # Update the ECS service with the new image tag
+       aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE \
+       --force-new-deployment \
+       --image 971819027904.dkr.ecr.us-east-1.amazonaws.com/your-repo-name:$IMAGE_TAG
+      env:
+        AWS_DEFAULT_REGION: us-east-1
+        IMAGE_TAG: ${{ github.run_number }}
