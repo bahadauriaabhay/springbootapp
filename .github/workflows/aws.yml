@@ -86,9 +86,7 @@ jobs:
         # BUILD_NUMBER=${{ github.run_number }}
 
         # Update the ECS service with the new image tag
-        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE \
-        --force-new-deployment \
-        --image 971819027904.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --image 971819027904.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
       env:
         AWS_DEFAULT_REGION: us-east-1
         IMAGE_TAG: ${{ github.run_number }}
