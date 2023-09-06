@@ -80,20 +80,21 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    - name: Deploy to ECS with updated image tag
+      run: |
 
-  
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+        # Fetch the existing task definition JSON
+        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > existing-task-definition.json
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+        #  Update the image field in the existing task definition JSON
+        jq --arg newImage "971819027904.dkr.ecr.us-east-1.amazonaws.com/your-repo-name:$IMAGE_TAG" \
+        '.taskDefinition.containerDefinitions[0].image = $newImage' existing-task-definition.json > updated-task-definition.json
+
+        # Register the updated task definition
+        aws ecs register-task-definition --cli-input-json file://updated-task-definition.json
+
+        # Update the ECS service to use the new task definition
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $ECS_TASK_DEFINITION
+      env:
+        AWS_DEFAULT_REGION: us-east-1 # Change to your AWS region
+        IMAGE_TAG: ${{ github.run_number }}
