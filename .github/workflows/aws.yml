@@ -85,10 +85,11 @@ jobs:
 
         # Fetch the existing task definition JSON
         aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > existing-task-definition.json
-
+        cat existing-task-definition.json
         #  Update the image field in the existing task definition JSON
-        jq --arg newImage "971819027904.dkr.ecr.us-east-1.amazonaws.com/your-repo-name:$IMAGE_TAG" \
-        '.taskDefinition.containerDefinitions[0].image = $newImage' existing-task-definition.json > updated-task-definition.json
+        #jq --arg newImage "971819027904.dkr.ecr.us-east-1.amazonaws.com/your-repo-name:$IMAGE_TAG" \
+        #'.taskDefinition.containerDefinitions[0].image = $newImage:$IMAGE_TAG' existing-task-definition.json > updated-task-definition.json
+        jq '.containerDefinitions[0].image = $newImage/$ECR_REPOSITORY:$IMAGE_TAG' existing_task_definition.json > updated_task_definition.json
 
         # Register the updated task definition
         aws ecs register-task-definition --cli-input-json file://updated-task-definition.json
@@ -98,3 +99,4 @@ jobs:
       env:
         AWS_DEFAULT_REGION: us-east-1 # Change to your AWS region
         IMAGE_TAG: ${{ github.run_number }}
+        newImage: 971819027904.dkr.ecr.us-east-1.amazonaws.com
