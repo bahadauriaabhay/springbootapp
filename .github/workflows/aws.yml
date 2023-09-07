@@ -86,7 +86,9 @@ jobs:
       run: |
 
         # Fetch the existing task definition JSON
-        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION_NAME > existing_task_definition.json
+        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION_NAME --query taskDefinition > existing_task_definition.json
+        ls
+        pwd
         cat existing_task_definition.json
         ls
         pwd
