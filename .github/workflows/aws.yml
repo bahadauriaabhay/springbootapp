@@ -84,15 +84,15 @@ jobs:
       run: |
 
         # Fetch the existing task definition JSON
-        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > existing-task-definition.json
+        aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > existing_task_definition.json
         cat existing-task-definition.json
         #  Update the image field in the existing task definition JSON
         #jq --arg newImage "971819027904.dkr.ecr.us-east-1.amazonaws.com/your-repo-name:$IMAGE_TAG" \
-        #'.taskDefinition.containerDefinitions[0].image = $newImage:$IMAGE_TAG' existing-task-definition.json > updated-task-definition.json
+        #'.taskDefinition.containerDefinitions[0].image = $newImage:$IMAGE_TAG' existing_task_definition.json > updated_task_definition.json
         jq '.containerDefinitions[0].image = "$newImage/$ECR_REPOSITORY:$IMAGE_TAG"' existing_task_definition.json > updated_task_definition.json
 
         # Register the updated task definition
-        aws ecs register-task-definition --cli-input-json file://updated-task-definition.json
+        aws ecs register-task-definition --cli-input-json file://updated_task_definition.json
 
         # Update the ECS service to use the new task definition
         aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $ECS_TASK_DEFINITION
