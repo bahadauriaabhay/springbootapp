@@ -1,4 +1,4 @@
-## Docker commands to build , tag and push docker image to ECR registry
+##  Docker commands to build , tag and push docker image to ECR registry
 ``` 
 docker build -t 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag> -f Dockerfile .
 docker push 8xxxxxxxxx3.dkr.ecr.us-east-1.amazonaws.com/<registry>:<tag>
