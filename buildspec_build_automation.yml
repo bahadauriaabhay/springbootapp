@@ -1,0 +1,33 @@
+version: 0.2
+run-as: root
+env:
+  AWS_DEFAULT_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
+  AWS_ACCOUNT_ID: 971819027904
+  IMAGE_TAG: latest
+  IMAGE_REPO_NAME: springboot                             # set this to your Amazon ECR repository name
+  ECS_CLUSTER: ecs-infra-qa                              # set this to your Amazon ECS cluster name
+  ECS_SERVICE: springboot-qa                             # set this to your Amazon ECS service name
+  ECS_TASK_DEFINITION_NAME: springboot-qa                # set this to your Amazon ECS task definition name
+  CONTAINER_NAME: springboot-qa                          # set this to the name of the container in the containerDefinitions section of your task definition
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG -f "${DockerFilePath}" .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
