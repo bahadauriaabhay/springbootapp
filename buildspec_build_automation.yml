@@ -3,6 +3,7 @@ run-as: root
 env:
   AWS_DEFAULT_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
   AWS_ACCOUNT_ID: 971819027904
+  DockerFilePath: Dockerfile
   IMAGE_TAG: latest
   IMAGE_REPO_NAME: springboot                             # set this to your Amazon ECR repository name
   ECS_CLUSTER: ecs-infra-qa                              # set this to your Amazon ECS cluster name
