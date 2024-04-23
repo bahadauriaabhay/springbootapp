@@ -70,11 +70,10 @@ jobs:
     - name: Assume IAM Role and Get Temporary Credentials
       id: assume-role
       run: |
-        TEMP_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::971819027904:role/ecr_test --role-session-name GitHubActions-ECRPush --duration-seconds 900)
-        echo "::set-env name=AWS_ACCESS_KEY_ID::$(echo $TEMP_ROLE | jq -r '.Credentials.AccessKeyId')"
-        echo "::set-env name=AWS_SECRET_ACCESS_KEY::$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')"
-        echo "::set-env name=AWS_SESSION_TOKEN::$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')"
-
+        TEMP_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::971819027904:role/ecr_test --role-session-name GitHubActions-ECRPush --duration-seconds 900 --output json)
+        export AWS_ACCESS_KEY_ID=$(echo $TEMP_ROLE | jq -r '.Credentials.AccessKeyId')
+        export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
+        export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
     - name: Login to AWS ECR
       run: |
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
