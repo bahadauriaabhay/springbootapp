@@ -62,7 +62,7 @@ jobs:
         aws-role-duration-seconds: 900  # Optional: Set the duration for assumed role (in seconds)
 
     - name: Login to AWS ECR
-      run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 971819027904.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+      run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
       env:
         AWS_ACCESS_KEY_ID: ${{ steps.assume-role.outputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ steps.assume-role.outputs.aws-secret-access-key }}
