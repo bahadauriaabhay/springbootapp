@@ -54,24 +54,46 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       
-    - name: Assume IAM Role and Retrieve Temporary Credentials
+    # - name: Assume IAM Role and Retrieve Temporary Credentials
+    #   id: assume-role
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-region: us-east-1
+    #     aws-role-to-assume: arn:aws:iam::971819027904:role/ecr_test
+    #     aws-role-duration-seconds: 900  # Optional: Set the duration for assumed role (in seconds)
+
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
+    - name: Assume IAM Role and Get Temporary Credentials
       id: assume-role
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: us-east-1
-        aws-role-to-assume: arn:aws:iam::971819027904:role/ecr_test
-        aws-role-duration-seconds: 900  # Optional: Set the duration for assumed role (in seconds)
+      run: |
+        TEMP_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::971819027904:role/ecr_test --role-session-name GitHubActions-ECRPush --duration-seconds 900)
+        echo "::set-env name=AWS_ACCESS_KEY_ID::$(echo $TEMP_ROLE | jq -r '.Credentials.AccessKeyId')"
+        echo "::set-env name=AWS_SECRET_ACCESS_KEY::$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')"
+        echo "::set-env name=AWS_SESSION_TOKEN::$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')"
 
     - name: Login to AWS ECR
-      run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
       env:
-        AWS_ACCESS_KEY_ID: ${{ steps.assume-role.outputs.aws-access-key-id }}
-        AWS_SECRET_ACCESS_KEY: ${{ steps.assume-role.outputs.aws-secret-access-key }}
-        AWS_SESSION_TOKEN: ${{ steps.assume-role.outputs.aws-session-token }}
+        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+
+    # - name: Login to AWS ECR
+    #   run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ steps.assume-role.outputs.aws-access-key-id }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ steps.assume-role.outputs.aws-secret-access-key }}
+    #     AWS_SESSION_TOKEN: ${{ steps.assume-role.outputs.aws-session-token }}
+
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
