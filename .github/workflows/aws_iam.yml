@@ -56,8 +56,9 @@ jobs:
       
     - name: Assume IAM Role and Retrieve Temporary Credentials
       id: assume-role
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
+        aws-region: us-east-1
         aws-role-to-assume: arn:aws:iam::971819027904:role/ecr_test
         aws-role-duration-seconds: 900  # Optional: Set the duration for assumed role (in seconds)
 
