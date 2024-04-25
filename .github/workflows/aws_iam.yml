@@ -24,21 +24,23 @@
 #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
 #    and best practices on handling the access key credentials.
 
-name: Deploy to Amazon ECS
-
+name: Deploy to Amazon ECS using 
 
 on:
-  push:
-    branches: [ "master" ]
+  workflow_dispatch:
 
-# env:
-#   AWS_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
-#   ECR_REPOSITORY: springboot                             # set this to your Amazon ECR repository name
-#   ECS_CLUSTER: ecs-infra-qa                              # set this to your Amazon ECS cluster name
-#   ECS_SERVICE: springboot-qa                             # set this to your Amazon ECS service name
-#   ECS_TASK_DEFINITION_NAME: springboot-qa                # set this to your Amazon ECS task definition name
-#   CONTAINER_NAME: springboot-qa                          # set this to the name of the container in the containerDefinitions section of your task definition
-#   ECS_TASK_DEFINITION: existing_task_definition.json     # set this to the path to your Amazon ECS task definition file, e.g. .aws/task-definition.json
+# on:
+#   push:
+#     branches: [ "master" ]
+
+env:
+  AWS_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: springboot                             # set this to your Amazon ECR repository name
+  ECS_CLUSTER: ecs-infra-qa                              # set this to your Amazon ECS cluster name
+  ECS_SERVICE: springboot-qa                             # set this to your Amazon ECS service name
+  ECS_TASK_DEFINITION_NAME: springboot-qa                # set this to your Amazon ECS task definition name
+  CONTAINER_NAME: springboot-qa                          # set this to the name of the container in the containerDefinitions section of your task definition
+  ECS_TASK_DEFINITION: existing_task_definition.json     # set this to the path to your Amazon ECS task definition file, e.g. .aws/task-definition.json
 
  
 permissions:
@@ -53,7 +55,35 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      
+
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_test }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_test }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.run_number }}
+      run: |
+        # Build a docker container and push it to ECR so that it can be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+
+
+
+
+
     # - name: Assume IAM Role and Retrieve Temporary Credentials
     #   id: assume-role
     #   uses: aws-actions/configure-aws-credentials@v4
@@ -62,25 +92,25 @@ jobs:
     #     aws-role-to-assume: arn:aws:iam::971819027904:role/ecr_test
     #     aws-role-duration-seconds: 900  # Optional: Set the duration for assumed role (in seconds)
 
-    - name: Install AWS CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y awscli
+    # - name: Install AWS CLI
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y awscli
 
-    - name: Assume IAM Role and Get Temporary Credentials
-      id: assume-role
-      run: |
-        TEMP_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::971819027904:role/ecr_test --role-session-name GitHubActions-ECRPush --duration-seconds 900 --output json)
-        export AWS_ACCESS_KEY_ID=$(echo $TEMP_ROLE | jq -r '.Credentials.AccessKeyId')
-        export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
-        export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
-    - name: Login to AWS ECR
-      run: |
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
-      env:
-        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
+    # - name: Assume IAM Role and Get Temporary Credentials
+    #   id: assume-role
+    #   run: |
+    #     TEMP_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::971819027904:role/ecr_test --role-session-name GitHubActions-ECRPush --duration-seconds 900 --output json)
+    #     export AWS_ACCESS_KEY_ID=$(echo $TEMP_ROLE | jq -r '.Credentials.AccessKeyId')
+    #     export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
+    #     export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
+    # - name: Login to AWS ECR
+    #   run: |
+    #     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 971819027904.dkr.ecr.us-east-1.amazonaws.com
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
 
 
     # - name: Login to AWS ECR
